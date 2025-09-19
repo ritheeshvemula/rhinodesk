@@ -34,7 +34,7 @@ export const WhyChooseUs = () => {
             Why Choose RhinoDesk?
           </h2>
           <p className="text-xl max-w-2xl mx-auto" style={{ color: "#6d7b8c" }}>
-            We're committed to providing exceptional furniture solutions that enhance your lifestyle and work environment.
+            We are committed to providing exceptional furniture solutions that enhance your lifestyle and work environment.
           </p>
         </div>
 

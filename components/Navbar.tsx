@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -77,6 +77,32 @@ export const Navbar = () => {
     setIsMobileMenuOpen(false); // Close mobile menu
   };
 
+  // Add custom styles to head
+  useEffect(() => {
+    const styleElement = document.createElement("style");
+    styleElement.textContent = `
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .animate-fade-in-up {
+        animation: fadeInUp 0.4s ease-out forwards;
+      }
+    `;
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
+
   return (
     <>
       <nav className="border-b border-border sticky top-0 z-50 backdrop-blur-sm bg-background/95">
@@ -153,7 +179,7 @@ export const Navbar = () => {
             <div className="flex items-center justify-end space-x-3">
               <Button
                 variant="ghost"
-                className={`${montserrat.className} font-semibold text-sm hover:cursor-pointer`}
+                className={`${montserrat.className} font-semibold text-sm`}
                 onClick={handleContactClick}
               >
                 CONTACT
@@ -204,68 +230,144 @@ export const Navbar = () => {
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 bg-black/20 backdrop-blur-sm">
-          <div className="fixed top-16 left-0 right-0 bg-background border-b border-border shadow-lg max-h-[calc(100vh-4rem)] overflow-y-auto">
-            <div className="px-4 py-6">
-              
-              {/* Mobile Categories */}
-              <div className="space-y-4 mb-8">
-                {categories.map((category) => (
-                  <div key={category.name} className="space-y-2">
-                    {/* Category Header */}
-                    <div className="flex items-center justify-between">
-                      <button
-                        onClick={() => handleCategoryClick(category.cname)}
-                        className={`${montserrat.className} text-left font-semibold text-lg text-foreground hover:text-[#D7263D] transition-colors flex-1`}
-                      >
-                        {category.name}
-                      </button>
-                      <button
-                        onClick={() => toggleMobileCategory(category.name)}
-                        className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        <ChevronDown 
-                          className={`h-4 w-4 transition-transform ${
-                            expandedMobileCategory === category.name ? 'rotate-180' : ''
-                          }`}
-                        />
-                      </button>
-                    </div>
+        <div className="lg:hidden fixed inset-0 z-40">
+          {/* Backdrop with blur */}
+          <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-black/20 to-black/30 backdrop-blur-md" 
+               onClick={() => setIsMobileMenuOpen(false)} />
+          
+          {/* Menu Panel */}
+          <div className="fixed top-16 left-0 right-0 bg-gradient-to-br from-background via-background/95 to-background/90 
+                         backdrop-blur-xl border-b border-border/50 shadow-2xl max-h-[calc(100vh-4rem)] overflow-y-auto
+                         animate-in slide-in-from-top-2 duration-300 ease-out">
+            
+            {/* Decorative top border */}
+            <div className="h-1 bg-gradient-to-r from-[#D7263D]/0 via-[#D7263D] to-[#D7263D]/0" />
+            
+            <div className="px-6 py-8">
+              {/* Welcome Text */}
+              <div className="mb-8">
+                <h2 className={`${poppins.className} text-2xl font-bold text-[#D7263D] mb-2`}>
+                  Our Products
+                </h2>
+                <p className="text-muted-foreground text-sm">
+                  Explore our premium office furniture collections
+                </p>
+              </div>
 
-                    {/* Category Description (Expandable) */}
-                    {expandedMobileCategory === category.name && (
-                      <div className="pl-4 pb-4 border-l-2 border-[#D7263D]/20">
-                        <div className="flex flex-col sm:flex-row gap-4">
-                          <img
-                            src={category.image}
-                            alt={category.name}
-                            className="w-full sm:w-32 h-24 object-cover rounded-md"
+              {/* Mobile Categories */}
+              <div className="space-y-3 mb-10">
+                {categories.map((category, index) => (
+                  <div 
+                    key={category.name} 
+                    className="group animate-fade-in-up"
+                    style={{ 
+                      animationDelay: `${index * 50}ms`
+                    }}
+                  >
+                    {/* Category Card */}
+                    <div className="bg-gradient-to-r from-background to-muted/20 rounded-xl border border-border/50 
+                                   shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden
+                                   hover:border-[#D7263D]/30 group-hover:transform group-hover:scale-[1.02]">
+                      
+                      {/* Category Header */}
+                      <div className="flex items-center justify-between p-4">
+                        <button
+                          onClick={() => handleCategoryClick(category.cname)}
+                          className={`${montserrat.className} text-left font-bold text-lg text-foreground 
+                                   hover:text-[#D7263D] transition-all duration-300 flex-1 group-hover:translate-x-1`}
+                        >
+                          <span className="flex items-center">
+                            <div className="w-2 h-2 bg-[#D7263D] rounded-full mr-3 opacity-0 group-hover:opacity-100 
+                                          transition-opacity duration-300" />
+                            {category.name}
+                          </span>
+                        </button>
+                        
+                        <button
+                          onClick={() => toggleMobileCategory(category.name)}
+                          className="p-3 rounded-full hover:bg-muted/50 text-muted-foreground hover:text-[#D7263D] 
+                                   transition-all duration-300 hover:scale-110"
+                        >
+                          <ChevronDown 
+                            className={`h-5 w-5 transition-transform duration-300 ${
+                              expandedMobileCategory === category.name ? 'rotate-180' : ''
+                            }`}
                           />
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {category.description}
-                          </p>
+                        </button>
+                      </div>
+
+                      {/* Category Description (Expandable) */}
+                      <div className={`overflow-hidden transition-all duration-500 ease-out ${
+                        expandedMobileCategory === category.name ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                      }`}>
+                        <div className="px-4 pb-6">
+                          <div className="bg-gradient-to-br from-muted/30 to-muted/10 rounded-lg p-4 border border-border/30">
+                            <div className="flex flex-col gap-4">
+                              <div className="relative overflow-hidden rounded-lg group/image">
+                                <img
+                                  src={category.image}
+                                  alt={category.name}
+                                  className="w-full h-32 object-cover transition-transform duration-500 
+                                           group-hover/image:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent 
+                                               opacity-0 group-hover/image:opacity-100 transition-opacity duration-300" />
+                              </div>
+                              <div className="space-y-2">
+                                <h4 className={`${montserrat.className} font-semibold text-foreground`}>
+                                  {category.name}
+                                </h4>
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                  {category.description}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    )}
+                    </div>
                   </div>
                 ))}
               </div>
 
               {/* Mobile Contact & WhatsApp */}
-              <div className="space-y-4 pt-6 border-t border-border">
-                <Button
-                  variant="ghost"
-                  className={`${montserrat.className} w-full justify-start font-semibold text-lg h-12`}
-                  onClick={handleContactClick}
-                >
-                  CONTACT
-                </Button>
-                <Link href="https://wa.me/7416157474" target="_blank" rel="noopener noreferrer" className="block">
-                  <Button className="w-full bg-[#2fd520cb] hover:bg-[#3fc31bb1] text-white font-semibold h-12">
-                    <MessageCircle className="h-5 w-5 mr-3" />
-                    WhatsApp
+              <div className="space-y-4 pt-8 border-t border-gradient-to-r from-border/0 via-border to-border/0">
+                <div className="text-center mb-6">
+                  <h3 className={`${montserrat.className} font-bold text-lg text-foreground mb-2`}>
+                    Get in Touch
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Ready to transform your workspace?
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <Button
+                    variant="ghost"
+                    className={`${montserrat.className} w-full justify-center font-semibold text-lg h-14 
+                             bg-gradient-to-r from-muted/50 to-muted/30 hover:from-muted/70 hover:to-muted/50
+                             border border-border/50 rounded-xl transition-all duration-300 
+                             hover:scale-[1.02] hover:shadow-lg group`}
+                    onClick={handleContactClick}
+                  >
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-[#D7263D] rounded-full mr-3 animate-pulse" />
+                      CONTACT US
+                    </div>
                   </Button>
-                </Link>
+                  
+                  <Link href="https://wa.me/7416157474" target="_blank" rel="noopener noreferrer" className="block">
+                    <Button className="w-full h-14 bg-gradient-to-r from-[#25D366] to-[#20BA5A] 
+                                     hover:from-[#20BA5A] hover:to-[#1BA94C] text-white font-bold text-lg
+                                     rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 
+                                     hover:scale-[1.02] border-2 border-white/20 group">
+                      <div className="flex items-center">
+                        <MessageCircle className="h-6 w-6 mr-3 group-hover:animate-bounce" />
+                        WhatsApp Chat
+                      </div>
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

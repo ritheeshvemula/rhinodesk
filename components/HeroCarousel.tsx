@@ -96,7 +96,7 @@ export const HeroCarousel = () => {
                       className="hover:opacity-90 hover:cursor-pointer bg-[#D7263D] hover:bg-[#EB2842] text-white"
                      
                     >
-                      View Catalog
+                      View Catalogue
                     </Button>
                     </Link>
                    
